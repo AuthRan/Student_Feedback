@@ -5,6 +5,8 @@ import InstiForm from './components/InstiForm.jsx';
 import About from './components/About.jsx';
 import AdminPortal from './components/AdminPortal.jsx';
 import StudentPortal from './components/StudentPortal.jsx';
+import AdminLogin from "./components/AdminLogin";
+import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
 
   return (
@@ -24,8 +26,17 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/instiform" element={<InstiForm />} />
         <Route path="/about" element={<About />} />
-        <Route path="/admin" element={<AdminPortal />} />
+        {/* <Route path="/admin" element={<AdminPortal />} /> */}
+        <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/student" element={<StudentPortal />} />
+        <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <AdminPortal />
+          </ProtectedRoute>
+        }
+      />
       </Routes>
     </div>
     </>

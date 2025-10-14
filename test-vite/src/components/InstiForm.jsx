@@ -15,6 +15,8 @@ import {
   FileText,
   Users,
   Calendar,
+  Globe,
+  BookOpen,
 } from "lucide-react";
 
 const InstiForm = () => {
@@ -22,43 +24,31 @@ const InstiForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
-    // Basic Information
     instituteName: "",
     instituteType: "",
     establishedYear: "",
     affiliationBoard: "",
-
-    // Contact Information
     email: "",
     phone: "",
     alternatePhone: "",
     website: "",
-
-    // Address Information
     address: "",
     city: "",
     state: "",
     pincode: "",
     country: "India",
-
-    // Admin Account
     adminName: "",
     adminDesignation: "",
     adminEmail: "",
     password: "",
     confirmPassword: "",
-
-    // Additional Information
     totalStudents: "",
     totalFaculty: "",
     departments: "",
     description: "",
-
-    // Terms
     agreeTerms: false,
     agreeNewsletter: false,
   });
-
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -111,64 +101,43 @@ const InstiForm = () => {
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: "" }));
-    }
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
   const validateStep = (step) => {
     const newErrors = {};
-
     if (step === 1) {
-      if (!formData.instituteName.trim())
-        newErrors.instituteName = "Institute name is required";
-      if (!formData.instituteType)
-        newErrors.instituteType = "Institute type is required";
-      if (!formData.establishedYear)
-        newErrors.establishedYear = "Established year is required";
+      if (!formData.instituteName.trim()) newErrors.instituteName = "Institute name is required";
+      if (!formData.instituteType) newErrors.instituteType = "Institute type is required";
+      if (!formData.establishedYear) newErrors.establishedYear = "Established year is required";
       if (!formData.email.trim()) newErrors.email = "Email is required";
-      else if (!/\S+@\S+\.\S+/.test(formData.email))
-        newErrors.email = "Email is invalid";
+      else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email is invalid";
       if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
-      else if (!/^[6-9]\d{9}$/.test(formData.phone))
-        newErrors.phone = "Enter valid 10-digit phone number";
+      else if (!/^[6-9]\d{9}$/.test(formData.phone)) newErrors.phone = "Enter valid 10-digit phone number";
     }
-
     if (step === 2) {
       if (!formData.address.trim()) newErrors.address = "Address is required";
       if (!formData.city.trim()) newErrors.city = "City is required";
       if (!formData.state) newErrors.state = "State is required";
       if (!formData.pincode.trim()) newErrors.pincode = "Pincode is required";
-      else if (!/^\d{6}$/.test(formData.pincode))
-        newErrors.pincode = "Enter valid 6-digit pincode";
+      else if (!/^\d{6}$/.test(formData.pincode)) newErrors.pincode = "Enter valid 6-digit pincode";
     }
-
     if (step === 3) {
-      if (!formData.adminName.trim())
-        newErrors.adminName = "Admin name is required";
-      if (!formData.adminDesignation.trim())
-        newErrors.adminDesignation = "Designation is required";
-      if (!formData.adminEmail.trim())
-        newErrors.adminEmail = "Admin email is required";
-      else if (!/\S+@\S+\.\S+/.test(formData.adminEmail))
-        newErrors.adminEmail = "Email is invalid";
+      if (!formData.adminName.trim()) newErrors.adminName = "Admin name is required";
+      if (!formData.adminDesignation.trim()) newErrors.adminDesignation = "Designation is required";
+      if (!formData.adminEmail.trim()) newErrors.adminEmail = "Admin email is required";
+      else if (!/\S+@\S+\.\S+/.test(formData.adminEmail)) newErrors.adminEmail = "Email is invalid";
       if (!formData.password) newErrors.password = "Password is required";
-      else if (formData.password.length < 8)
-        newErrors.password = "Password must be at least 8 characters";
-      if (formData.password !== formData.confirmPassword)
-        newErrors.confirmPassword = "Passwords do not match";
-      if (!formData.agreeTerms)
-        newErrors.agreeTerms = "You must agree to terms and conditions";
+      else if (formData.password.length < 8) newErrors.password = "Password must be at least 8 characters";
+      if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords do not match";
+      if (!formData.agreeTerms) newErrors.agreeTerms = "You must agree to terms and conditions";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleNext = () => {
-    if (validateStep(currentStep)) {
-      setCurrentStep((prev) => prev + 1);
-    }
+    if (validateStep(currentStep)) setCurrentStep((prev) => prev + 1);
   };
 
   const handlePrevious = () => {
@@ -176,230 +145,166 @@ const InstiForm = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (validateStep(3)) {
       setIsSubmitting(true);
       try {
-        const response = await fetch(
-          "http://localhost:5000/api/institute/register",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              ...formData,
-              // sanitize as needed, e.g., parse numbers
-              establishedYear: Number(formData.establishedYear),
-              totalStudents: formData.totalStudents
-                ? Number(formData.totalStudents)
-                : undefined,
-              totalFaculty: formData.totalFaculty
-                ? Number(formData.totalFaculty)
-                : undefined,
-              departments: formData.departments
-                ? Number(formData.departments)
-                : undefined,
-            }),
-          }
-        );
+        const response = await fetch("http://localhost:5000/api/institute/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...formData,
+            establishedYear: Number(formData.establishedYear),
+            totalStudents: formData.totalStudents ? Number(formData.totalStudents) : undefined,
+            totalFaculty: formData.totalFaculty ? Number(formData.totalFaculty) : undefined,
+            departments: formData.departments ? Number(formData.departments) : undefined,
+          }),
+        });
+        
         if (response.ok) {
-          alert("Institute registered successfully!");
-          setIsSubmitting(false);
-          // Optionally reset form here
-        } else {
           const data = await response.json();
-          alert(data.error || "Registration failed, please check your input.");
+          alert("Institute registered successfully!");
+          console.log("Registration successful:", data);
+          setIsSubmitting(false);
+        } else {
+          const errorData = await response.json();
+          alert(errorData.error || "Registration failed, please check your input.");
+          console.error("Registration failed:", errorData);
           setIsSubmitting(false);
         }
       } catch (err) {
-        alert("A server error occurred!");
+        console.error("Network error:", err);
+        alert("A server error occurred! Make sure your backend is running on http://localhost:5000");
         setIsSubmitting(false);
       }
     }
   };
 
-  const renderProgressBar = () => (
-    <div className="mb-8">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-4">
-          {[1, 2, 3].map((step) => (
-            <div key={step} className="flex items-center">
-              <div
-                className={`
-                w-10 h-10 rounded-full flex items-center justify-center font-semibold
-                ${
-                  currentStep >= step
-                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                    : "bg-gray-200 text-gray-500"
-                }
-              `}
-              >
-                {currentStep > step ? <Check className="w-5 h-5" /> : step}
-              </div>
-              {step < 3 && (
-                <div
-                  className={`
-                  w-16 h-1 mx-2
-                  ${
-                    currentStep > step
-                      ? "bg-gradient-to-r from-blue-600 to-purple-600"
-                      : "bg-gray-200"
-                  }
-                `}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="flex justify-between text-sm">
-        <span
-          className={
-            currentStep >= 1 ? "text-blue-600 font-medium" : "text-gray-500"
-          }
-        >
-          Basic Information
-        </span>
-        <span
-          className={
-            currentStep >= 2 ? "text-blue-600 font-medium" : "text-gray-500"
-          }
-        >
-          Address Details
-        </span>
-        <span
-          className={
-            currentStep >= 3 ? "text-blue-600 font-medium" : "text-gray-500"
-          }
-        >
-          Admin Account
-        </span>
-      </div>
-    </div>
-  );
-
-  const renderFormField = (
-    field,
-    label,
-    type = "text",
-    icon = null,
-    options = null,
-    placeholder = ""
-  ) => (
+  const renderFormField = ({ label, name, type = "text", placeholder, icon: Icon, required = false, options = null, rows = null }) => (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">
-        {label}{" "}
-        {[
-          "instituteName",
-          "email",
-          "phone",
-          "address",
-          "city",
-          "state",
-          "pincode",
-          "adminName",
-          "adminEmail",
-          "password",
-        ].includes(field) && <span className="text-red-500">*</span>}
+      <label className="block text-sm font-semibold text-gray-700">
+        {label} {required && <span className="text-red-500">*</span>}
       </label>
       <div className="relative">
-        {icon && (
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            {icon}
-          </div>
-        )}
+        {Icon && <Icon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />}
         {type === "select" ? (
           <select
-            value={formData[field]}
-            onChange={(e) => handleInputChange(field, e.target.value)}
-            className={`
-              w-full ${
-                icon ? "pl-10" : "pl-3"
-              } pr-3 py-3 border border-gray-300 rounded-xl 
-              focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200
-              ${errors[field] ? "border-red-500" : ""}
-            `}
+            value={formData[name]}
+            onChange={(e) => handleInputChange(name, e.target.value)}
+            className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors[name] ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'}`}
           >
             <option value="">{placeholder}</option>
             {options?.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
+              <option key={option} value={option}>{option}</option>
             ))}
           </select>
         ) : type === "textarea" ? (
           <textarea
-            value={formData[field]}
-            onChange={(e) => handleInputChange(field, e.target.value)}
+            value={formData[name]}
+            onChange={(e) => handleInputChange(name, e.target.value)}
             placeholder={placeholder}
-            rows={3}
-            className={`
-              w-full ${
-                icon ? "pl-10" : "pl-3"
-              } pr-3 py-3 border border-gray-300 rounded-xl 
-              focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none
-              ${errors[field] ? "border-red-500" : ""}
-            `}
+            rows={rows || 3}
+            className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-vertical ${errors[name] ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'}`}
           />
         ) : type === "password" ? (
           <div className="relative">
             <input
-              type={
-                field === "password"
-                  ? showPassword
-                    ? "text"
-                    : "password"
-                  : showConfirmPassword
-                  ? "text"
-                  : "password"
-              }
-              value={formData[field]}
-              onChange={(e) => handleInputChange(field, e.target.value)}
+              type={name === "password" ? (showPassword ? "text" : "password") : (showConfirmPassword ? "text" : "password")}
+              value={formData[name]}
+              onChange={(e) => handleInputChange(name, e.target.value)}
               placeholder={placeholder}
-              className={`
-                w-full ${
-                  icon ? "pl-10" : "pl-3"
-                } pr-12 py-3 border border-gray-300 rounded-xl 
-                focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200
-                ${errors[field] ? "border-red-500" : ""}
-              `}
+              className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-12 py-3 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors[name] ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'}`}
             />
             <button
               type="button"
-              onClick={() =>
-                field === "password"
-                  ? setShowPassword(!showPassword)
-                  : setShowConfirmPassword(!showConfirmPassword)
-              }
-              className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              onClick={() => name === "password" ? setShowPassword(!showPassword) : setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
-              {(field === "password" ? showPassword : showConfirmPassword) ? (
-                <EyeOff className="w-5 h-5 text-gray-400" />
-              ) : (
-                <Eye className="w-5 h-5 text-gray-400" />
-              )}
+              {(name === "password" ? showPassword : showConfirmPassword) ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
           </div>
         ) : (
           <input
             type={type}
-            value={formData[field]}
-            onChange={(e) => handleInputChange(field, e.target.value)}
+            value={formData[name]}
+            onChange={(e) => handleInputChange(name, e.target.value)}
             placeholder={placeholder}
-            className={`
-              w-full ${
-                icon ? "pl-10" : "pl-3"
-              } pr-3 py-3 border border-gray-300 rounded-xl 
-              focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200
-              ${errors[field] ? "border-red-500" : ""}
-            `}
+            className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors[name] ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'}`}
           />
         )}
       </div>
-      {errors[field] && (
-        <div className="flex items-center space-x-2 text-red-500 text-sm">
+      {errors[name] && (
+        <div className="flex items-center space-x-2 text-red-600 text-sm">
           <AlertCircle className="w-4 h-4" />
-          <span>{errors[field]}</span>
+          <span>{errors[name]}</span>
         </div>
+      )}
+    </div>
+  );
+
+  const renderProgressBar = () => (
+    <div className="mb-8">
+      <div className="flex items-center justify-between mb-4">
+        {[1, 2, 3].map((step) => (
+          <div key={step} className="flex items-center">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${currentStep >= step ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' : 'bg-gray-200 text-gray-500'}`}>
+              {currentStep > step ? <Check className="w-5 h-5" /> : step}
+            </div>
+            {step < 3 && <div className={`w-20 h-1 mx-2 ${currentStep > step ? 'bg-gradient-to-r from-blue-600 to-purple-600' : 'bg-gray-200'}`} />}
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-between text-sm text-gray-600">
+        <span className={currentStep >= 1 ? 'font-semibold text-blue-600' : ''}>Basic Info</span>
+        <span className={currentStep >= 2 ? 'font-semibold text-blue-600' : ''}>Address</span>
+        <span className={currentStep >= 3 ? 'font-semibold text-blue-600' : ''}>Admin Account</span>
+      </div>
+    </div>
+  );
+
+  const renderNavigation = () => (
+    <div className="flex justify-between pt-8 border-t">
+      <button
+        type="button"
+        onClick={handlePrevious}
+        disabled={currentStep === 1}
+        className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center space-x-2 ${
+          currentStep === 1 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+        }`}
+      >
+        <ArrowLeft className="w-5 h-5" />
+        <span>Previous</span>
+      </button>
+      {currentStep < 3 ? (
+        <button
+          type="button"
+          onClick={handleNext}
+          className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center space-x-2"
+        >
+          <span>Continue</span>
+          <ArrowLeft className="w-5 h-5 rotate-180" />
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          className={`px-8 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center space-x-2 ${
+            isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+          } text-white`}
+        >
+          {isSubmitting ? (
+            <>
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>Registering...</span>
+            </>
+          ) : (
+            <>
+              <Check className="w-5 h-5" />
+              <span>Register Institute</span>
+            </>
+          )}
+        </button>
       )}
     </div>
   );
@@ -416,15 +321,12 @@ const InstiForm = () => {
             <ArrowLeft className="w-5 h-5 mr-2" />
             Back to Home
           </button>
-
           <div className="flex items-center justify-center space-x-3 mb-4">
             <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center">
               <GraduationCap className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Institute Registration
-              </h1>
+              <h1 className="text-3xl font-bold text-gray-900">Institute Registration</h1>
               <p className="text-gray-600">Join the EduFeedback platform</p>
             </div>
           </div>
@@ -434,372 +336,254 @@ const InstiForm = () => {
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
           <div className="p-8">
             {renderProgressBar()}
-
-            <div>
-              {/* Step 1: Basic Information */}
-              {currentStep === 1 && (
-                <div className="space-y-6">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <Building2 className="w-6 h-6 text-blue-600" />
-                    <h2 className="text-2xl font-bold text-gray-900">
-                      Basic Information
-                    </h2>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {renderFormField(
-                      "instituteName",
-                      "Institute Name",
-                      "text",
-                      <Building2 className="w-5 h-5 text-gray-400" />,
-                      null,
-                      "Enter your institute name"
-                    )}
-
-                    {renderFormField(
-                      "instituteType",
-                      "Institute Type",
-                      "select",
-                      <GraduationCap className="w-5 h-5 text-gray-400" />,
-                      instituteTypes,
-                      "Select institute type"
-                    )}
-
-                    {renderFormField(
-                      "establishedYear",
-                      "Established Year",
-                      "number",
-                      <Calendar className="w-5 h-5 text-gray-400" />,
-                      null,
-                      "YYYY"
-                    )}
-
-                    {renderFormField(
-                      "affiliationBoard",
-                      "Affiliation/Board",
-                      "text",
-                      <FileText className="w-5 h-5 text-gray-400" />,
-                      null,
-                      "e.g., AICTE, UGC, CBSE"
-                    )}
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {renderFormField(
-                      "email",
-                      "Official Email",
-                      "email",
-                      <Mail className="w-5 h-5 text-gray-400" />,
-                      null,
-                      "institute@example.com"
-                    )}
-
-                    {renderFormField(
-                      "phone",
-                      "Phone Number",
-                      "tel",
-                      <Phone className="w-5 h-5 text-gray-400" />,
-                      null,
-                      "10-digit phone number"
-                    )}
-
-                    {renderFormField(
-                      "alternatePhone",
-                      "Alternate Phone",
-                      "tel",
-                      <Phone className="w-5 h-5 text-gray-400" />,
-                      null,
-                      "Optional"
-                    )}
-
-                    {renderFormField(
-                      "website",
-                      "Website URL",
-                      "url",
-                      <Building2 className="w-5 h-5 text-gray-400" />,
-                      null,
-                      "https://example.com"
-                    )}
-                  </div>
+            
+            {/* Step 1: Basic Information */}
+            {currentStep === 1 && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {renderFormField({
+                    label: "Institute Name",
+                    name: "instituteName",
+                    placeholder: "Enter institute name",
+                    icon: Building2,
+                    required: true,
+                  })}
+                  {renderFormField({
+                    label: "Institute Type",
+                    name: "instituteType",
+                    type: "select",
+                    placeholder: "Select institute type",
+                    icon: GraduationCap,
+                    options: instituteTypes,
+                    required: true,
+                  })}
                 </div>
-              )}
-
-              {/* Step 2: Address Information */}
-              {currentStep === 2 && (
-                <div className="space-y-6">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <MapPin className="w-6 h-6 text-blue-600" />
-                    <h2 className="text-2xl font-bold text-gray-900">
-                      Address Details
-                    </h2>
-                  </div>
-
-                  <div className="space-y-6">
-                    {renderFormField(
-                      "address",
-                      "Complete Address",
-                      "textarea",
-                      <MapPin className="w-5 h-5 text-gray-400" />,
-                      null,
-                      "Enter full address"
-                    )}
-
-                    <div className="grid md:grid-cols-2 gap-6">
-                      {renderFormField(
-                        "city",
-                        "City",
-                        "text",
-                        <MapPin className="w-5 h-5 text-gray-400" />,
-                        null,
-                        "Enter city name"
-                      )}
-
-                      {renderFormField(
-                        "state",
-                        "State",
-                        "select",
-                        <MapPin className="w-5 h-5 text-gray-400" />,
-                        indianStates,
-                        "Select state"
-                      )}
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-6">
-                      {renderFormField(
-                        "pincode",
-                        "Pincode",
-                        "text",
-                        <MapPin className="w-5 h-5 text-gray-400" />,
-                        null,
-                        "6-digit pincode"
-                      )}
-
-                      {renderFormField(
-                        "country",
-                        "Country",
-                        "text",
-                        <MapPin className="w-5 h-5 text-gray-400" />,
-                        null,
-                        "Country"
-                      )}
-                    </div>
-                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {renderFormField({
+                    label: "Established Year",
+                    name: "establishedYear",
+                    type: "number",
+                    placeholder: "e.g., 1990",
+                    icon: Calendar,
+                    required: true,
+                  })}
+                  {renderFormField({
+                    label: "Affiliation/Board",
+                    name: "affiliationBoard",
+                    placeholder: "e.g., AICTE, UGC, CBSE",
+                    icon: FileText,
+                  })}
                 </div>
-              )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {renderFormField({
+                    label: "Email Address",
+                    name: "email",
+                    type: "email",
+                    placeholder: "institute@example.com",
+                    icon: Mail,
+                    required: true,
+                  })}
+                  {renderFormField({
+                    label: "Phone Number",
+                    name: "phone",
+                    placeholder: "10-digit phone number",
+                    icon: Phone,
+                    required: true,
+                  })}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {renderFormField({
+                    label: "Alternate Phone",
+                    name: "alternatePhone",
+                    placeholder: "Optional alternate number",
+                    icon: Phone,
+                  })}
+                  {renderFormField({
+                    label: "Website",
+                    name: "website",
+                    placeholder: "https://www.example.com",
+                    icon: Globe,
+                  })}
+                </div>
+                {renderNavigation()}
+              </div>
+            )}
 
-              {/* Step 3: Admin Account & Additional Info */}
-              {currentStep === 3 && (
-                <form
-                  className="space-y-6"
-                  onSubmit={handleSubmit}
-                  autoComplete="off"
-                >
-                  <div className="flex items-center space-x-3 mb-6">
-                    <User className="w-6 h-6 text-blue-600" />
-                    <h2 className="text-2xl font-bold text-gray-900">
-                      Admin Account Setup
-                    </h2>
+            {/* Step 2: Address Information */}
+            {currentStep === 2 && (
+              <div className="space-y-6">
+                {renderFormField({
+                  label: "Complete Address",
+                  name: "address",
+                  type: "textarea",
+                  placeholder: "Enter full address with landmark",
+                  icon: MapPin,
+                  required: true,
+                  rows: 3,
+                })}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {renderFormField({
+                    label: "City",
+                    name: "city",
+                    placeholder: "Enter city name",
+                    icon: Building2,
+                    required: true,
+                  })}
+                  {renderFormField({
+                    label: "State",
+                    name: "state",
+                    type: "select",
+                    placeholder: "Select state",
+                    icon: MapPin,
+                    options: indianStates,
+                    required: true,
+                  })}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {renderFormField({
+                    label: "Pincode",
+                    name: "pincode",
+                    placeholder: "6-digit pincode",
+                    icon: MapPin,
+                    required: true,
+                  })}
+                  {renderFormField({
+                    label: "Country",
+                    name: "country",
+                    placeholder: "Country",
+                    icon: Globe,
+                  })}
+                </div>
+                {renderNavigation()}
+              </div>
+            )}
+
+            {/* Step 3: Admin Account & Additional Info */}
+            {currentStep === 3 && (
+              <div className="space-y-6">
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+                  <h3 className="text-lg font-semibold text-blue-900 mb-2">Admin Account Details</h3>
+                  <p className="text-blue-700 text-sm">This account will be used for institute administration and management.</p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {renderFormField({
+                    label: "Admin Full Name",
+                    name: "adminName",
+                    placeholder: "Enter admin name",
+                    icon: User,
+                    required: true,
+                  })}
+                  {renderFormField({
+                    label: "Admin Designation",
+                    name: "adminDesignation",
+                    placeholder: "e.g., Principal, Director",
+                    icon: User,
+                    required: true,
+                  })}
+                </div>
+                
+                {renderFormField({
+                  label: "Admin Email",
+                  name: "adminEmail",
+                  type: "email",
+                  placeholder: "admin@institute.com",
+                  icon: Mail,
+                  required: true,
+                })}
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {renderFormField({
+                    label: "Password",
+                    name: "password",
+                    type: "password",
+                    placeholder: "Minimum 8 characters",
+                    icon: Lock,
+                    required: true,
+                  })}
+                  {renderFormField({
+                    label: "Confirm Password",
+                    name: "confirmPassword",
+                    type: "password",
+                    placeholder: "Re-enter password",
+                    icon: Lock,
+                    required: true,
+                  })}
+                </div>
+
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                  <h4 className="text-md font-semibold text-gray-900 mb-4">Additional Information (Optional)</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+                    {renderFormField({
+                      label: "Total Students",
+                      name: "totalStudents",
+                      type: "number",
+                      placeholder: "Number of students",
+                      icon: Users,
+                    })}
+                    {renderFormField({
+                      label: "Total Faculty",
+                      name: "totalFaculty",
+                      type: "number",
+                      placeholder: "Number of faculty",
+                      icon: Users,
+                    })}
+                    {renderFormField({
+                      label: "Departments",
+                      name: "departments",
+                      type: "number",
+                      placeholder: "Number of departments",
+                      icon: BookOpen,
+                    })}
                   </div>
+                  {renderFormField({
+                    label: "Institute Description",
+                    name: "description",
+                    type: "textarea",
+                    placeholder: "Brief description about the institute (optional)",
+                    rows: 3,
+                  })}
+                </div>
 
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {renderFormField(
-                      "adminName",
-                      "Admin Full Name",
-                      "text",
-                      <User className="w-5 h-5 text-gray-400" />,
-                      null,
-                      "Enter admin name"
-                    )}
-
-                    {renderFormField(
-                      "adminDesignation",
-                      "Designation",
-                      "text",
-                      <User className="w-5 h-5 text-gray-400" />,
-                      null,
-                      "e.g., Principal, Director"
-                    )}
-
-                    {renderFormField(
-                      "adminEmail",
-                      "Admin Email",
-                      "email",
-                      <Mail className="w-5 h-5 text-gray-400" />,
-                      null,
-                      "admin@example.com"
-                    )}
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {renderFormField(
-                      "password",
-                      "Password",
-                      "password",
-                      <Lock className="w-5 h-5 text-gray-400" />,
-                      null,
-                      "Minimum 8 characters"
-                    )}
-
-                    {renderFormField(
-                      "confirmPassword",
-                      "Confirm Password",
-                      "password",
-                      <Lock className="w-5 h-5 text-gray-400" />,
-                      null,
-                      "Re-enter password"
-                    )}
-                  </div>
-
-                  {/* Additional Information */}
-                  <div className="border-t pt-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                      Additional Information
-                    </h3>
-                    <div className="grid md:grid-cols-3 gap-6">
-                      {renderFormField(
-                        "totalStudents",
-                        "Total Students",
-                        "number",
-                        <Users className="w-5 h-5 text-gray-400" />,
-                        null,
-                        "Approximate count"
-                      )}
-
-                      {renderFormField(
-                        "totalFaculty",
-                        "Total Faculty",
-                        "number",
-                        <Users className="w-5 h-5 text-gray-400" />,
-                        null,
-                        "Faculty count"
-                      )}
-
-                      {renderFormField(
-                        "departments",
-                        "Number of Departments",
-                        "number",
-                        <Building2 className="w-5 h-5 text-gray-400" />,
-                        null,
-                        "Department count"
-                      )}
+                <div className="space-y-4 pt-4">
+                  <label className="flex items-start space-x-3">
+                    <input
+                      type="checkbox"
+                      checked={formData.agreeTerms}
+                      onChange={(e) => handleInputChange("agreeTerms", e.target.checked)}
+                      className="mt-1 w-5 h-5 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">
+                      I agree to the{" "}
+                      <a href="#" className="text-blue-600 hover:underline">Terms and Conditions</a>
+                      {" "}and{" "}
+                      <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>
+                      <span className="text-red-500 ml-1">*</span>
+                    </span>
+                  </label>
+                  {errors.agreeTerms && (
+                    <div className="flex items-center space-x-2 text-red-600 text-sm">
+                      <AlertCircle className="w-4 h-4" />
+                      <span>{errors.agreeTerms}</span>
                     </div>
-
-                    {renderFormField(
-                      "description",
-                      "Institute Description",
-                      "textarea",
-                      <FileText className="w-5 h-5 text-gray-400" />,
-                      null,
-                      "Brief description about your institute (optional)"
-                    )}
-                  </div>
-
-                  {/* Terms and Conditions */}
-                  <div className="space-y-4 border-t pt-6">
-                    <label className="flex items-start space-x-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.agreeTerms}
-                        onChange={(e) =>
-                          handleInputChange("agreeTerms", e.target.checked)
-                        }
-                        className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
-                      <span className="text-sm text-gray-700">
-                        I agree to the{" "}
-                        <a href="#" className="text-blue-600 hover:underline">
-                          Terms & Conditions
-                        </a>{" "}
-                        and
-                        <a
-                          href="#"
-                          className="text-blue-600 hover:underline ml-1"
-                        >
-                          Privacy Policy
-                        </a>{" "}
-                        *
-                      </span>
-                    </label>
-                    {errors.agreeTerms && (
-                      <div className="flex items-center space-x-2 text-red-500 text-sm">
-                        <AlertCircle className="w-4 h-4" />
-                        <span>{errors.agreeTerms}</span>
-                      </div>
-                    )}
-
-                    <label className="flex items-start space-x-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.agreeNewsletter}
-                        onChange={(e) =>
-                          handleInputChange("agreeNewsletter", e.target.checked)
-                        }
-                        className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
-                      <span className="text-sm text-gray-700">
-                        Subscribe to our newsletter for updates and insights
-                      </span>
-                    </label>
-                  </div>
-
-                  {/* Navigation Buttons */}
-                  <div className="flex justify-between pt-8 border-t">
-                    <button
-                      type="button"
-                      onClick={handlePrevious}
-                      disabled={currentStep === 1}
-                      className={`
-                    px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center space-x-2
-                    ${
-                      currentStep === 1
-                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }
-                  `}
-                    >
-                      <ArrowLeft className="w-5 h-5" />
-                      <span>Previous</span>
-                    </button>
-
-                    {currentStep < 3 ? (
-                      <button
-                        type="button"
-                        onClick={handleNext}
-                        className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center space-x-2"
-                      >
-                        <span>Continue</span>
-                        <ArrowLeft className="w-5 h-5 rotate-180" />
-                      </button>
-                    ) : (
-                      <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className={`
-                      px-8 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center space-x-2
-                      ${
-                        isSubmitting
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
-                      } text-white
-                      `}
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                            <span>Registering...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Check className="w-5 h-5" />
-                            <span>Register Institute</span>
-                          </>
-                        )}
-                      </button>
-                    )}
-                  </div>
-                </form>
-              )}
-            </div>
+                  )}
+                  
+                  <label className="flex items-start space-x-3">
+                    <input
+                      type="checkbox"
+                      checked={formData.agreeNewsletter}
+                      onChange={(e) => handleInputChange("agreeNewsletter", e.target.checked)}
+                      className="mt-1 w-5 h-5 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">
+                      Subscribe to our newsletter for updates and announcements
+                    </span>
+                  </label>
+                </div>
+                
+                {renderNavigation()}
+              </div>
+            )}
           </div>
         </div>
 

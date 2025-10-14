@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const InstituteSchema = new mongoose.Schema({
   instituteName: { type: String, required: true },
@@ -22,7 +23,21 @@ const InstituteSchema = new mongoose.Schema({
   totalFaculty: { type: Number },
   departments: { type: Number },
   description: { type: String },
-  agreeNewsletter: { type: Boolean }
+  agreeNewsletter: { type: Boolean },
+  adminEmail: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
 });
+
+// Hash password before saving
+InstituteSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+// Password comparison
+InstituteSchema.methods.comparePassword = function (candidate) {
+  return bcrypt.compare(candidate, this.password);
+};
 
 module.exports = mongoose.model('Institute', InstituteSchema);
