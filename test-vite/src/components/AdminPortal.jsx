@@ -242,7 +242,7 @@ const AdminPortal = () => {
     setFeedbackForm(prev => ({
       ...prev,
       questions: prev.questions.map(q => 
-        q.id === questionId 
+        q.id === questionId   
           ? { 
               ...q, 
               options: q.options.map((opt, idx) => 
