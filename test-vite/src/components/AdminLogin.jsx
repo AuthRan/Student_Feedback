@@ -8,6 +8,14 @@ const AdminLogin = ({ onSuccess }) => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  // This useEffect hook handles redirecting a user who is already logged in
+  useEffect(() => {
+    const token = localStorage.getItem("adminToken");
+    if (token) {
+      navigate("/admin", { replace: true });
+    }
+  }, [navigate]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -20,12 +28,22 @@ const AdminLogin = ({ onSuccess }) => {
         body: JSON.stringify({ adminEmail, password }),
       });
       const data = await res.json();
+
       if (res.ok) {
-        // Store the JWT token, adminEmail, etc.
+        // --- THIS IS THE KEY SECTION ---
+        // 1. Store the login token and other necessary info
         localStorage.setItem("adminToken", data.token);
         localStorage.setItem("adminEmail", data.adminEmail);
         localStorage.setItem("instituteId", data.instituteId);
+
+        // This line was missing or misplaced in your previous code.
+        // It's the command that performs the automatic redirect.
         if (onSuccess) onSuccess(data);
+        
+        // 2. Automatically navigate to the admin portal
+        navigate("/admin", { replace: true });
+        // --- END OF KEY SECTION ---
+        
       } else {
         setError(data.error || "Login failed. Please try again.");
       }

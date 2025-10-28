@@ -23,6 +23,7 @@ app.get('/', (req, res) => {
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/institute', instituteRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/campaigns', require('./routes/campaign'));
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
