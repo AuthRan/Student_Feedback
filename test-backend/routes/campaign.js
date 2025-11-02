@@ -47,4 +47,37 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+
+// Add this new route to the bottom of the file
+
+// @route   GET api/campaigns/:id
+// @desc    Get a single feedback campaign by its ID (Public Route)
+// @access  Public
+router.get('/:id', async (req, res) => {
+  try {
+    const campaign = await Campaign.findById(req.params.id);
+
+    if (!campaign) {
+      return res.status(404).json({ msg: 'Feedback form not found' });
+    }
+    
+    // We only send the necessary data to the student
+    res.json({
+        _id: campaign._id,
+        title: campaign.title,
+        description: campaign.description,
+        questions: campaign.questions
+    });
+
+  } catch (err) {
+    console.error(err.message);
+    if (err.kind === 'ObjectId') {
+        return res.status(404).json({ msg: 'Feedback form not found' });
+    }
+    res.status(500).send('Server Error');
+  }
+});
+
+// module.exports = router; // This line should already be at the end
+
 module.exports = router;

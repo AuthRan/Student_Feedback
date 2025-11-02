@@ -24,6 +24,7 @@ app.use('/api/feedback', feedbackRoutes);
 app.use('/api/institute', instituteRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/campaigns', require('./routes/campaign'));
+app.use('/api/students', require('./routes/student'));
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
