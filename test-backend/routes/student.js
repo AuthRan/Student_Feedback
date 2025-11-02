@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const Student = require('../models/Student');
 const Institute = require('../models/Institute');
 const auth = require('../middleware/auth');
+const Campaign = require('../models/Campaign');
 
 const JWT_SECRET = 'SuperSecretStringDontShare'; // Use the same secret as your admin login
 
@@ -142,5 +143,39 @@ router.get('/profile', auth, async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
+
+
+// @route   GET api/students/campaigns
+// @desc    Get all feedback campaigns for the student's institute
+// @access  Private (requires student login)
+router.get('/campaigns', auth, async (req, res) => {
+  try {
+    console.log("Fetching campaigns for student:", req.user);
+    
+    // Get the student's info from the JWT token
+    const student = await Student.findById(req.user.studentId);
+
+    if (!student) {
+      console.log("Student not found for ID:", req.user.studentId);
+      return res.status(404).json({ msg: 'Student not found' });
+    }
+
+    console.log("Found student:", student.name, "Institute:", student.institute);
+
+    // Find ALL campaigns created by this student's institute (not filtered by department/year)
+    const campaigns = await Campaign.find({
+      createdBy: student.institute, // Match the student's institute
+    })
+    .select('_id title description targetDepartment targetYear deadline status questions')
+    .sort({ createdAt: -1 }); // Newest first
+
+    console.log("Found campaigns:", campaigns.length);
+    res.json(campaigns);
+  } catch (err) {
+    console.error("Error in /campaigns route:", err.message);
+    res.status(500).json({ msg: 'Server Error', error: err.message });
+  }
+});
+
 
 module.exports = router;
